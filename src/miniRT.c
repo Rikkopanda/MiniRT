@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/13 20:42:22 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/16 13:08:11 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void draw_square(t_data	*data, int start_xy[2], int size_len_width[2])
 void	init_sphere(t_data *data)
 {
 	data->sphere.radius = 20;
-	data->sphere.color = BLUE;
+	data->sphere.color = ORANGE;
 	data->sphere.object_center_xyz[0] = 200;
 	data->sphere.object_center_xyz[1] = 0;
 	data->sphere.object_center_xyz[2] = 0;
@@ -178,6 +178,61 @@ void	print_matrix_3_3(float m[3][3])
 	}
 }
 
+/**
+ * https://www.freetext.org/Introduction_to_Linear_Algebra/Basic_Vector_Operations/Normalization/
+*/
+void normalize_vector(float v[3])
+{
+	float magnitude;
+	double squared;
+
+	squared = pow((double)v[0], 2) + pow((double)v[1], 2) + pow((double)v[2], 2);
+	magnitude = (float)sqrt(squared);
+	printf("before\n");
+	print_matrix_1_3(v);
+	vector_scaling(v, 1 / magnitude);
+	printf("after\n");
+	print_matrix_1_3(v);
+
+
+
+	// return ()
+}
+
+void set_rgb_factor(float *rgb_factor)
+{
+	if (*rgb_factor >= 0)
+	{
+		*rgb_factor += 1;
+		*rgb_factor /= 2;
+	}
+	else if (*rgb_factor < 0)
+	{
+		*rgb_factor *= -1;
+		*rgb_factor /= 2;
+	}
+}
+int	interpolate(int color_A, int color_B, float t);
+int create_color(int r, int g, int b);
+
+int visualize_sphere_normals(t_data *data, float res_xyz[3])
+{
+	float rgb_factor[3];
+
+	normalize_vector(res_xyz);
+	copy_matrix(rgb_factor, res_xyz);
+	set_rgb_factor(&rgb_factor[0]);
+	set_rgb_factor(&rgb_factor[1]);
+	set_rgb_factor(&rgb_factor[2]);
+	printf("factor\n");
+	print_matrix_1_3(rgb_factor);
+	printf("________________________\n");
+	// return (create_color(interpolate(BLUE, ORANGE, rgb_factor[0]) << 16, interpolate(RED, WHITE, rgb_factor[1]) << 8, interpolate(GREEN, BLACK, rgb_factor[2])));
+	// return (interpolate(BLUE, ORANGE, rgb_factor[0]));
+	return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
+	//255 * rgb_factor[0]
+}
+
 int hit_object(t_data *data)
 {
 	float res_xyz[3];
@@ -186,7 +241,6 @@ int hit_object(t_data *data)
 	// print_matrix_1_3(data->ray.scaled_vector);
 	// printf("obj center\n"); 
 	// print_matrix_1_3(data->sphere.object_center_xyz);
-
 	res_xyz[0] = data->ray.scaled_vector[0]
 		- data->sphere.object_center_xyz[0];
  	res_xyz[1] = data->ray.scaled_vector[1]
@@ -201,9 +255,63 @@ int hit_object(t_data *data)
 	// printf("radius %f\n",  data->sphere.radius);
 	// sleep(1);
 	if (sqrt(squared) <= (double)data->sphere.radius)
-		return (data->sphere.color);
+	{
+		// visualize_sphere_normals(data, res_xyz);
+		return (visualize_sphere_normals(data, res_xyz));
+		// return (data->sphere.color);
+	}
 	else
 		return ((int)NADA);
+}
+
+typedef struct s_color
+{
+	int r;
+	int g;
+	int b;
+} t_color;
+
+int	get_r(int color)
+{
+	return (color >> 16 & 0xFF);
+}
+
+int	get_g(int color)
+{
+	return (color >> 8 & 0xFF);
+}
+
+int	get_b(int color)
+{
+	return (color & 0xFF);
+}
+
+void init_rgb(t_color *rgb, int color)
+{
+	rgb->r = get_r(color);
+	rgb->g = get_g(color);
+	rgb->b = get_b(color);
+}
+
+int create_color(int r, int g, int b)
+{
+	return (r << 16 | g << 8 | b);
+}
+
+int	interpolate(int color_A, int color_B, float t)
+{
+	t_color rgb_a;
+	t_color rgb_b;
+	t_color rgb_interpolate;
+
+
+	init_rgb(&rgb_a, color_A);
+	init_rgb(&rgb_b, color_B);
+
+	rgb_interpolate.r = rgb_a.r + (rgb_b.r - rgb_a.r) * t;
+	rgb_interpolate.g = rgb_a.g + (rgb_b.g - rgb_a.g) * t;
+	rgb_interpolate.b = rgb_a.b + (rgb_b.b - rgb_a.b) * t;
+	return (create_color(rgb_interpolate.r, rgb_interpolate.g, rgb_interpolate.b));
 }
 
 int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
@@ -235,19 +343,24 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	// if (PRINT_DEBUG) printf("scaled:\n");
 	while (step < 200)
 	{
+		int hit_result;
 		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
-		vector_scaling(&data->ray, (float)step);
-		int hit_result = hit_object(data);
+		vector_scaling(data->ray.scaled_vector, (float)step);
+		// if (angle_horiz > -0.05 && angle_horiz < 0.05)
+		hit_result = hit_object(data);
 		if (hit_result != NADA)
 		{
+			// normalize_vector(&data->ray.direction_abc)
 			// printf("hit at xyz: :\n");
 			// print_matrix_1_3(data->ray.scaled_vector);
 			return (hit_result);
 		}
-		step += 15;
+		step += 1;
 		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
 	}
-	return (((int)NADA));
+	// if (angle_horiz > 0 && angle_horiz < 0.09)
+	// 	printf("%f\n", data->ray.direction_abc[2]);
+	return (NADA);
 }
 
 void	send_rays(t_data *data)
@@ -273,12 +386,16 @@ void	send_rays(t_data *data)
 		while (pixel_x <= WINDOW_WIDTH)
 		{
 			color = hit_ray(data, angle_horiz, angle_vert);
-			put_pixel_img(data->image, pixel_x, pixel_y, color);
-			if (color != NADA)
+			if (color == NADA)
 			{
+				float unit_point;
+
+				unit_point = (angle_vert + start_angle_vert) / data->camara.field_of_view_degrees;
+				color = interpolate(WHITE, BLUE, unit_point);
 				// printf("angle hori verti: %f\t%f\n", angle_horiz, angle_vert);
 				// printf("xy: %d\t%d\n", pixel_x, pixel_y);
 			}
+			put_pixel_img(data->image, pixel_x, pixel_y, color);
 			pixel_x++;
 			angle_horiz += angle_step_horiz;
 		}

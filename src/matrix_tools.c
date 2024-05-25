@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 15:29:32 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/13 14:05:57 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/16 12:23:02 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	matrix_multiplication(float comp[3][3], t_ray *ray, float camara_vector[3])
 	}
 }
 
-void	vector_scaling(t_ray *ray, float scale)
+void	vector_scaling(float v[3], float scale)
 {
 	int	i;
 	int	j;
@@ -83,8 +83,8 @@ void	vector_scaling(t_ray *ray, float scale)
 	i = 0;
 	while (i < 3)
 	{
-		ray->scaled_vector[i]
-			= ray->scaled_vector[i] * scale;
+		v[i]
+			= v[i] * scale;
 		i++;
 	}
 }

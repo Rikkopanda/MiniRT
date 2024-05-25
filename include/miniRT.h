@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/13 20:42:39 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/16 12:23:29 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ enum e_hex_code
 	WHITE = 0xFFFFFFFF,
 	RED = 0x00FF00FF,
 	GREEN = 0x0000FFFF,
-	BLUE = 0x00000FFF
+	BLUE = 0x00000FFF,
+	ORANGE = 0xFFA500
 };
 
 typedef struct s_img
@@ -123,6 +124,6 @@ void	init_t_around_y(float R[3][3], float rad);
 void	init_t_around_x(float R[3][3], float rad);
 void	init_result(float M[3]);
 double	ft_degr_to_rad(float x);
-void	vector_scaling(t_ray *ray, float scale);
+void	vector_scaling(float v[3], float scale);
 
 #endif
