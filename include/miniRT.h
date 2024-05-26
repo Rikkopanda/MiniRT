@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/16 12:23:29 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/26 10:53:49 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ typedef struct s_camara
 {
 	int		pos_xyz[3];
 	float	view_orientation_matrix[3];
-	float	field_of_view_degrees;
+	float	field_of_view_rad;
 } t_camara;
 
 typedef struct s_data

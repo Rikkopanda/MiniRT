@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/16 13:08:11 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/26 10:54:53 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void	init_sphere(t_data *data)
 
 void	init_camara(t_data *data)
 {
-	data->camara.field_of_view_degrees = 70;
+	data->camara.field_of_view_rad = ft_degr_to_rad(70);
 	data->camara.view_orientation_matrix[0] = 1;
 	data->camara.view_orientation_matrix[1] = 0;
 	data->camara.view_orientation_matrix[2] = 0;
@@ -201,17 +201,10 @@ void normalize_vector(float v[3])
 
 void set_rgb_factor(float *rgb_factor)
 {
-	if (*rgb_factor >= 0)
-	{
-		*rgb_factor += 1;
-		*rgb_factor /= 2;
-	}
-	else if (*rgb_factor < 0)
-	{
-		*rgb_factor *= -1;
-		*rgb_factor /= 2;
-	}
+	*rgb_factor += 1;
+	*rgb_factor *= 0.5;
 }
+
 int	interpolate(int color_A, int color_B, float t);
 int create_color(int r, int g, int b);
 
@@ -224,12 +217,17 @@ int visualize_sphere_normals(t_data *data, float res_xyz[3])
 	set_rgb_factor(&rgb_factor[0]);
 	set_rgb_factor(&rgb_factor[1]);
 	set_rgb_factor(&rgb_factor[2]);
-	printf("factor\n");
-	print_matrix_1_3(rgb_factor);
-	printf("________________________\n");
+	// printf("factor\n");
+	// print_matrix_1_3(rgb_factor);
+	// printf("________________________\n");
 	// return (create_color(interpolate(BLUE, ORANGE, rgb_factor[0]) << 16, interpolate(RED, WHITE, rgb_factor[1]) << 8, interpolate(GREEN, BLACK, rgb_factor[2])));
+	int const color1 = interpolate(BLUE, WHITE, rgb_factor[0]);
+	int const color2 = interpolate(RED, color1, rgb_factor[1]);
+	int const color3 = interpolate(GREEN, color2, rgb_factor[2]);
+
+	return (color3);
 	// return (interpolate(BLUE, ORANGE, rgb_factor[0]));
-	return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
+	// return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
 	//255 * rgb_factor[0]
 }
 
@@ -363,18 +361,37 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	return (NADA);
 }
 
+
+void	send_rays_v2(t_data *data)
+{
+
+	float 	start_angle_horiz = -data->camara.field_of_view_rad / 2;
+	float 	start_angle_vert = data->camara.field_of_view_rad / 2;
+	float 	angle_horiz;
+	float 	angle_vert;
+
+
+
+
+	float 	angle_step_horiz = data->camara.field_of_view_rad / WINDOW_WIDTH;
+	float 	angle_step_vert = data->camara.field_of_view_rad / WINDOW_HEIGHT;
+
+
+}
+
+
 void	send_rays(t_data *data)
 {
 	int 	pixel_x;
 	int 	pixel_y;
 	int		color;
-	float 	start_angle_horiz = -data->camara.field_of_view_degrees / 2;
-	float 	start_angle_vert = data->camara.field_of_view_degrees / 2;
+	float 	start_angle_horiz = -data->camara.field_of_view_rad / 2;
+	float 	start_angle_vert = data->camara.field_of_view_rad / 2;
 	float 	angle_horiz;
 	float 	angle_vert;
 
-	float 	angle_step_horiz = data->camara.field_of_view_degrees / WINDOW_WIDTH;
-	float 	angle_step_vert = data->camara.field_of_view_degrees / WINDOW_HEIGHT;
+	float 	angle_step_horiz = data->camara.field_of_view_rad / WINDOW_WIDTH;
+	float 	angle_step_vert = data->camara.field_of_view_rad / WINDOW_HEIGHT;
 
 	angle_vert = start_angle_vert;
 	pixel_x = 0;
@@ -390,7 +407,7 @@ void	send_rays(t_data *data)
 			{
 				float unit_point;
 
-				unit_point = (angle_vert + start_angle_vert) / data->camara.field_of_view_degrees;
+				unit_point = (angle_vert + start_angle_vert) / data->camara.field_of_view_rad;
 				color = interpolate(WHITE, BLUE, unit_point);
 				// printf("angle hori verti: %f\t%f\n", angle_horiz, angle_vert);
 				// printf("xy: %d\t%d\n", pixel_x, pixel_y);
