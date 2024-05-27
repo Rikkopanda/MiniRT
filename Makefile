@@ -9,7 +9,9 @@ SRCDIR = src/
 SRCS = miniRT.c \
 	matrixes.c \
 	matrix_tools.c \
-	send_rays.c
+	send_rays.c \
+	vector_functions.c \
+	colors_drawing.c
 
 OBJS = $(addprefix $(OBJDIR), $(notdir $(SRCS:.c=.o)))
 
@@ -20,6 +22,7 @@ FLAGS = -g \
 HEADERS = miniRT.h
 INCDIR = include
 INCLUDE = -I$(INCDIR)
+MINILIBX = minilibx-linux/libmlx_Linux.a
 
 # LIBFT = libft/libft.a
 
@@ -36,10 +39,10 @@ $(OBJDIR):
 	mkdir $(OBJDIR)
 
 $(NAME): $(OBJS) $(HEADERS)
-	cc $(OBJS) $(FLAGS) $(INCLUDE)-Lmlx_linux -Imlx_linux -lmlx_Linux -lXext -lX11 -lm -lz -o $(NAME)
+	cc $(OBJS) $(FLAGS) $(INCLUDE) $(MINILIBX) -Lmlx_Linux -Imlx_Linux -lXext -lX11 -lm -lz -o $(NAME)
 
 $(OBJS): $(OBJDIR)%.o: $(SRCDIR)%.c
-	cc $(FLAGS) $(INCLUDE) -Imlx_linux -O3 -c $< -o $@
+	cc $(FLAGS) $(INCLUDE) -O3 -c $< -o $@
 
 clean:
 	rm -f $(OBJS)

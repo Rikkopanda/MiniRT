@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   matrix_tools.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
+/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 15:29:32 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/26 12:21:16 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/27 08:52:00 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,4 +129,37 @@ double	ft_degr_to_rad(float x)
 		return (0);
 	x = (x * M_PI) / (float)180;
 	return (x);
+}
+
+void	print_matrix_1_3(float m[3])
+{
+	int i;
+
+	i = 0;
+	while (i < 3)
+	{
+		printf("%f\t", m[i]);
+		i++;
+	}
+	printf("\n");
+	// printf("_________________\n");
+}
+
+void	print_matrix_3_3(float m[3][3])
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < 3)
+	{
+		j = 0;
+		while (j < 3)
+		{
+			printf("%f\t", m[i][j]);
+			j++;
+		}
+		i++;
+		printf("\n");
+	}
 }

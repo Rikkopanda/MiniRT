@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
+/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/26 13:56:33 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/27 08:52:26 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 # define WINDOW_WIDTH 800
 # define DEGR_10_IN_RAD 0.1745329252
 
-
 #include <math.h>
 #include <unistd.h>
 #include <stdio.h>
+#include "../minilibx-linux/mlx.h"
 
 enum keys
 {
@@ -122,6 +122,13 @@ typedef struct s_transform_index
 
 }	t_transform_index;
 
+typedef struct s_color
+{
+	int r;
+	int g;
+	int b;
+} t_color;
+
 enum e_key_codes
 {
 	UP = 65362,
@@ -149,12 +156,23 @@ void	matrix_multiply_1x3_3x3(float m1[3], float m2[3][3], float result_m[3]);
 void	compilation_matrix(float comp[3][3], float R[3][3], float R3[3][3]);
 void	copy_matrix(float dst[3], float src[3]);
 
+void	normalize_vector(float v[3]);
+void	vector_scaling(float v[3], float scale);
+
+
+int		interpolate(int color_A, int color_B, float t);
+
 void	init_t_around_z(float R[3][3], float rad);
 void	init_t_around_y(float R[3][3], float rad);
 void	init_t_around_x(float R[3][3], float rad);
 void	init_result(float M[3]);
 double	ft_degr_to_rad(float x);
-void	vector_scaling(float v[3], float scale);
-void	send_rays(t_data *data);
+void	esend_rays(t_data *data);
+
+void	put_pixel_img(t_img img, int x, int y, int color);
+void	init_rgb(t_color *rgb, int color);
+
+void	print_matrix_3_3(float m[3][3]);
+void	print_matrix_1_3(float m[3]);
 
 #endif

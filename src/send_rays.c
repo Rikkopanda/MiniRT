@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   send_rays.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
+/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/26 14:03:06 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/27 08:53:48 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <time.h>
 #include "miniRT.h"
+#include "../minilibx-linux/mlx.h"
 
 void init_ray_send_tools(t_ray_sending_tools *r_t, t_data *data)
 {
@@ -19,6 +20,12 @@ void init_ray_send_tools(t_ray_sending_tools *r_t, t_data *data)
 	r_t->half_screen_height = WINDOW_HEIGHT * 0.5;
 	r_t->perpendicular_distance_horiz_triangle = r_t->half_screen_width / (float)tan(r_t->start_angle_horiz);
 	r_t->perpendicular_distance_vert_triangle = r_t->half_screen_height / (float)tan(r_t->start_angle_vert);
+}
+
+void set_rgb_factor(float *rgb_factor)
+{
+	*rgb_factor += 1;
+	*rgb_factor *= 0.5;
 }
 
 int visualize_sphere_normals(t_data *data, float res_xyz[3])
@@ -111,7 +118,7 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 		hit_result = hit_object(data);
 		if (hit_result != NADA)
 		{
-			// normalize_vector(&data->ray.direction_abc)
+			// normalize_vector(data->ray.direction_abc);
 			// printf("hit at xyz: :\n");
 			// print_matrix_1_3(data->ray.scaled_vector);
 			return (hit_result);
@@ -148,7 +155,6 @@ void	send_rays(t_data *data)
 				color = interpolate(WHITE, BLUE, unit_point);
 			}
 			put_pixel_img(data->image, r_t.pixel_x, r_t.pixel_y, color);
-
 			r_t.pixel_x++;
 		}
 		r_t.pixel_y++;
