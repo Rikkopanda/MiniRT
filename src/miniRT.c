@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 09:52:45 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 10:24:23 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,16 @@
 
 void	init_sphere(t_data *data)
 {
-	data->sphere.radius = 10;
+	data->sphere.radius = 30;
 	data->sphere.color = ORANGE;
-	data->sphere.object_center_xyz[0] = 50;
+	data->sphere.object_center_xyz[0] = 150;
 	data->sphere.object_center_xyz[1] = 0;
 	data->sphere.object_center_xyz[2] = 0;
 }
 
 void	init_camara(t_data *data)
 {
-	data->camara.field_of_view_rad = ft_degr_to_rad(150);
+	data->camara.field_of_view_rad = ft_degr_to_rad(70);
 	data->camara.view_orientation_matrix[0] = 1;
 	data->camara.view_orientation_matrix[1] = 0;
 	data->camara.view_orientation_matrix[2] = 0;

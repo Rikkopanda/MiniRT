@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 09:52:26 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 10:26:18 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void init_ray_send_tools(t_ray_sending_tools *r_t, t_data *data)
 {
 	r_t->half_screen_width = WINDOW_WIDTH * 0.5;
 	r_t->half_screen_height = WINDOW_HEIGHT * 0.5;
-	r_t->start_angle_horiz = -data->camara.field_of_view_rad * 0.5;
+	r_t->start_angle_horiz = data->camara.field_of_view_rad * 0.5;
 	r_t->start_angle_vert = data->camara.field_of_view_rad * 0.5;
 	r_t->perpendicular_distance_horiz_triangle = r_t->half_screen_width / (float)tan(r_t->start_angle_horiz);
 	r_t->perpendicular_distance_vert_triangle = r_t->half_screen_height / (float)tan(r_t->start_angle_vert);
@@ -50,16 +50,17 @@ int visualize_sphere_normals(t_data *data, float res_xyz[3])
 	return (color3);
 	// return (interpolate(BLUE, ORANGE, rgb_factor[0]));
 	// return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
-	//255 * rgb_factor[0]
 }
 
 int hit_object(t_data *data)
 {
 	float res_xyz[3];
 
-	// printf("ray direction\n"); 
+	// printf("ray dir\n"); 
+	// print_matrix_1_3(data->ray.direction_abc);
+	// printf("ray scaled\n"); 
 	// print_matrix_1_3(data->ray.scaled_vector);
-	// printf("obj center\n"); 
+	// printf("obj center\n");
 	// print_matrix_1_3(data->sphere.object_center_xyz);
 	res_xyz[0] = (data->ray.scaled_vector[0] - data->camara.pos_xyz[0])
 		- data->sphere.object_center_xyz[0];
@@ -67,7 +68,7 @@ int hit_object(t_data *data)
 		- data->sphere.object_center_xyz[1];
 	res_xyz[2] = (data->ray.scaled_vector[2] - data->camara.pos_xyz[2])
 		- data->sphere.object_center_xyz[2];
-	// sleep(1);
+	// usleep(5000);
 	// printf("result xyz %f %f %f\n", res_xyz[0], res_xyz[1], res_xyz[2]);
 
 	double squared = pow((double)res_xyz[0], 2) + pow((double)res_xyz[1], 2) + pow((double)res_xyz[2], 2);
@@ -102,15 +103,17 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 
 	// if (PRINT_DEBUG) printf("original\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->camara.view_orientation_matrix);
-	// init_result(data->ray.direction_abc);
-	// matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
+
+	init_result(data->ray.direction_abc);
+	matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
+
 	// if (PRINT_DEBUG) printf("result:\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
 	// if (PRINT_DEBUG) printf("_________________\n\n");
 	data->ray.vector_scalar_step = 1;
 	int step = 1;
 	// if (PRINT_DEBUG) printf("scaled:\n");
-	while (step < 100)
+	while (step < 200)
 	{
 		int hit_result;
 		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
@@ -132,6 +135,10 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	return (NADA);
 }
 
+// int	world_horizon_opposed_to_ray(t_data *data)
+// {
+// }
+
 void	send_rays(t_data *data)
 {
 	t_ray_sending_tools	r_t;
@@ -144,11 +151,11 @@ void	send_rays(t_data *data)
 	while (r_t.pixel_y <= WINDOW_HEIGHT)
 	{
 		r_t.pixel_x = 0;
-		r_t.angle_vert = atan2(-r_t.half_screen_height + r_t.pixel_y, r_t.perpendicular_distance_vert_triangle);
+		r_t.angle_vert = atan2(r_t.half_screen_height - r_t.pixel_y, r_t.perpendicular_distance_vert_triangle);
 		while (r_t.pixel_x <= WINDOW_WIDTH)
 		{
 			r_t.angle_horiz = atan2(-r_t.half_screen_width + r_t.pixel_x, r_t.perpendicular_distance_horiz_triangle);
-			// printf("angle   verti: %f\t%f\n", r_t.angle_horiz, r_t.angle_vert);
+			// if (PRINT_DEBUG) printf("angles horizontal, vertical: 1  %f\t%f\n", ft_rad_to_degr(r_t.angle_horiz), ft_rad_to_degr(r_t.angle_vert));
 			// printf("perp hori %f\n", r_t.perpendicular_distance_horiz_triangle);
 			// printf("perp verti %f\n", r_t.perpendicular_distance_vert_triangle);
 			// printf("screen half %d\n, ", r_t.half_screen_width);
@@ -157,6 +164,9 @@ void	send_rays(t_data *data)
 			if (color == NADA)
 			{
 				float unit_point;
+
+				// unit_point = world_horizon_opposed_to_ray(data);
+
 				unit_point = (r_t.angle_vert - r_t.start_angle_vert) / data->camara.field_of_view_rad;
 				color = interpolate(WHITE, BLUE, unit_point);
 			}

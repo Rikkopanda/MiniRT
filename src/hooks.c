@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/27 09:26:30 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/27 09:53:24 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 10:22:44 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	extra_keys(int keysym, t_data *data)
 	if (keysym == ON_ESC)
 		return (mlx_loop_end(data->mlx.mlx_ptr), -1);
 	else
-		return (0);
+		return (FALSE);
 }
 
 int	left_up_right_down_forward_backward(int keysym, t_data *data)
@@ -57,23 +57,28 @@ int	rotate_view(int keysym, t_data *data)
 	{
 		init_t_around_y(add_angle, DEGR_10_IN_RAD);
 		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);	
+		return (TRUE);
 	}
 	else if (keysym == DOWN)
 	{
 		init_t_around_y(add_angle, -DEGR_10_IN_RAD);
-		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);		
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
+		return (TRUE);
 	}
 	else if (keysym == LEFT)
 	{
 		init_t_around_z(add_angle, DEGR_10_IN_RAD);
-		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);		
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
+		return (TRUE);
+
 	}
 	else if (keysym == RIGHT)
 	{
 		init_t_around_z(add_angle, -DEGR_10_IN_RAD);
-		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);	
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
+		return (TRUE);
 	}
-	return (0);
+	return (FALSE);
 }
 
 /**
@@ -82,9 +87,9 @@ int	rotate_view(int keysym, t_data *data)
 */
 int handle_input(int keysym, t_data *data)
 {
-	if (left_up_right_down_forward_backward(keysym, data) == 0
-		&& rotate_view(keysym, data) == 0
-		&& extra_keys(keysym, data) != -1)
+	if (left_up_right_down_forward_backward(keysym, data) == FALSE
+		&& rotate_view(keysym, data) == FALSE
+		&& extra_keys(keysym, data) == FALSE)
 		return (0);
 	send_rays(data);
 	mlx_put_image_to_window(data->mlx.mlx_ptr, data->mlx.win_ptr, data->image.img_ptr, 0, 0);
