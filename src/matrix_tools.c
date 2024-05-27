@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 15:29:32 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/27 08:52:00 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 09:49:40 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,15 @@ void	vector_scaling(float v[3], float scale)
 	}
 }
 
-double	ft_degr_to_rad(float x)
+float	ft_rad_to_degr(float x)
+{
+	if (x == 0)
+		return (0);
+	x = (x / 2 * M_PI) * (float)360;
+	return (x);
+}
+
+float	ft_degr_to_rad(float x)
 {
 	if (x == 0)
 		return (0);

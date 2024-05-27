@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 08:52:26 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 09:49:22 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,13 +166,20 @@ void	init_t_around_z(float R[3][3], float rad);
 void	init_t_around_y(float R[3][3], float rad);
 void	init_t_around_x(float R[3][3], float rad);
 void	init_result(float M[3]);
-double	ft_degr_to_rad(float x);
-void	esend_rays(t_data *data);
+float	ft_degr_to_rad(float x);
+float	ft_rad_to_degr(float x);
+void	send_rays(t_data *data);
 
 void	put_pixel_img(t_img img, int x, int y, int color);
 void	init_rgb(t_color *rgb, int color);
 
 void	print_matrix_3_3(float m[3][3]);
 void	print_matrix_1_3(float m[3]);
+
+int		handle_input(int keysym, t_data *data);
+
+t_win	new_window(int w, int h, char *str);
+t_img	new_img(int w, int h, t_win window);
+void	destroy_image(t_img img);
 
 #endif

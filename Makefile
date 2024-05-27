@@ -11,7 +11,9 @@ SRCS = miniRT.c \
 	matrix_tools.c \
 	send_rays.c \
 	vector_functions.c \
-	colors_drawing.c
+	colors_drawing.c \
+	hooks.c \
+	ft_mlx_functions.c
 
 OBJS = $(addprefix $(OBJDIR), $(notdir $(SRCS:.c=.o)))
 

@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 08:53:48 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 09:52:26 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void init_ray_send_tools(t_ray_sending_tools *r_t, t_data *data)
 {
 	r_t->half_screen_width = WINDOW_WIDTH * 0.5;
 	r_t->half_screen_height = WINDOW_HEIGHT * 0.5;
+	r_t->start_angle_horiz = -data->camara.field_of_view_rad * 0.5;
+	r_t->start_angle_vert = data->camara.field_of_view_rad * 0.5;
 	r_t->perpendicular_distance_horiz_triangle = r_t->half_screen_width / (float)tan(r_t->start_angle_horiz);
 	r_t->perpendicular_distance_vert_triangle = r_t->half_screen_height / (float)tan(r_t->start_angle_vert);
 }
@@ -91,7 +93,7 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	init_t_around_z(rota_horiz, angle_horiz);
 	init_t_around_y(rota_vert, angle_vert);
 	compilation_matrix(comp, rota_horiz, rota_vert);
-	// if (PRINT_DEBUG) printf("angles horizontal, vertical: %f\t%f\n", angle_horiz, angle_vert);
+	// if (PRINT_DEBUG) printf("angles horizontal, vertical: %f\t%f\n", ft_rad_to_degr(angle_horiz), ft_rad_to_degr(angle_vert));
 
 	// if (PRINT_DEBUG) printf("_________________\n");
 	// if (PRINT_DEBUG) printf("rotation\n");
@@ -100,16 +102,15 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 
 	// if (PRINT_DEBUG) printf("original\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->camara.view_orientation_matrix);
-	init_result(data->ray.direction_abc);
-	matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
+	// init_result(data->ray.direction_abc);
+	// matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
 	// if (PRINT_DEBUG) printf("result:\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
-	// usleep(100);
 	// if (PRINT_DEBUG) printf("_________________\n\n");
 	data->ray.vector_scalar_step = 1;
-	int step = 2;
+	int step = 1;
 	// if (PRINT_DEBUG) printf("scaled:\n");
-	while (step < 200)
+	while (step < 100)
 	{
 		int hit_result;
 		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
@@ -123,8 +124,8 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 			// print_matrix_1_3(data->ray.scaled_vector);
 			return (hit_result);
 		}
-		step += 2;
-		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
+		step += 1;
+		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.scaled_vector);
 	}
 	// if (angle_horiz > 0 && angle_horiz < 0.09)
 	// 	printf("%f\n", data->ray.direction_abc[2]);
@@ -147,6 +148,11 @@ void	send_rays(t_data *data)
 		while (r_t.pixel_x <= WINDOW_WIDTH)
 		{
 			r_t.angle_horiz = atan2(-r_t.half_screen_width + r_t.pixel_x, r_t.perpendicular_distance_horiz_triangle);
+			// printf("angle   verti: %f\t%f\n", r_t.angle_horiz, r_t.angle_vert);
+			// printf("perp hori %f\n", r_t.perpendicular_distance_horiz_triangle);
+			// printf("perp verti %f\n", r_t.perpendicular_distance_vert_triangle);
+			// printf("screen half %d\n, ", r_t.half_screen_width);
+			// sleep(1);
 			color = hit_ray(data, r_t.angle_horiz, r_t.angle_vert);
 			if (color == NADA)
 			{
