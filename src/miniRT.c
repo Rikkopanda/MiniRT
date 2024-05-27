@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/26 10:54:53 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/26 14:02:18 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,6 @@
 #include "stdio.h"
 #include <stdlib.h>
 #include "../include/miniRT.h"
-
-#define WINDOW_HEIGHT 800
-#define WINDOW_WIDTH 800
 
 /**
  * mlxinit prepares essential data bts
@@ -49,10 +46,83 @@ void	destroy_image(t_img img)
 		mlx_destroy_image(img.win.mlx_ptr, img.img_ptr);
 }
 
-int handle_input(int keysym, t_data *data)
+
+int	extra_keys(int keysym, t_data *data)
 {
 	if (keysym == ON_ESC)
 		return (mlx_loop_end(data->mlx.mlx_ptr), -1);
+	else
+		return (0);
+}
+
+int	left_up_right_down_forward_backward(int keysym, t_data *data)
+{
+	if (keysym == 'w')
+		return (data->camara.pos_xyz[0] += 10, 1);
+	else if (keysym == 's')
+		return (data->camara.pos_xyz[0] -= 10, 1);	
+	else if (keysym == 'a')
+		return (data->camara.pos_xyz[1] += 10, 1);	
+	else if (keysym == 'd')
+		return (data->camara.pos_xyz[1] -= 10, 1);	
+	else if (keysym == 'r')
+		return (data->camara.pos_xyz[2] += 10, 1);	
+	else if (keysym == 'f')
+		return (data->camara.pos_xyz[2] -= 10, 1);
+	else
+		return (0);
+}
+
+// int	rotate_around_z(int keysym, t_data *data)
+// {
+// }
+// int	rotate_around_y(int keysym, t_data *data)
+// {
+// }
+
+int	rotate_view(int keysym, t_data *data)
+{
+	float	add_angle[3][3];
+	float	original_orientation_matrix[3];
+
+	copy_matrix(original_orientation_matrix, data->camara.view_orientation_matrix);
+	if (keysym == UP)
+	{
+		init_t_around_y(add_angle, DEGR_10_IN_RAD);
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);	
+	}
+	else if (keysym == DOWN)
+	{
+		init_t_around_y(add_angle, -DEGR_10_IN_RAD);
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);		
+	}
+	else if (keysym == LEFT)
+	{
+		init_t_around_z(add_angle, DEGR_10_IN_RAD);
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);		
+	}
+	else if (keysym == RIGHT)
+	{
+		init_t_around_z(add_angle, -DEGR_10_IN_RAD);
+		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);	
+	}
+	else
+		return (0);
+}
+/**
+ * @note putting all into a while() to select function pointer could be faster than if else's?
+ * 
+*/
+int handle_input(int keysym, t_data *data)
+{
+	if (left_up_right_down_forward_backward(keysym, data) == 0
+		&& rotate_view(keysym, data) == 0)
+		return (0);
+	else if (extra_keys(keysym, data) < 0)
+		return (0);
+	send_rays(data);
+	mlx_put_image_to_window(data->mlx.mlx_ptr, data->mlx.win_ptr, data->image.img_ptr, 0, 0);
+	printf("%d key\n", keysym);
     return (0);
 }
 
@@ -131,19 +201,7 @@ void	init_cylinder(t_data *data)
 	// data->cylinder.axis_vector_abc[0] = -1;
 }
 
-void	copy_matrix(float dst[3], float src[3])
-{
-	int i;
-
-	i = 0;
-	while (i < 3)
-	{
-		dst[i] = src[i];
-		i++;
-	}
-}
 // copy_matrix(data->ray.direction_abc, data->camara.view_orientation_matrix);
-
 
 void	print_matrix_1_3(float m[3])
 {
@@ -188,14 +246,11 @@ void normalize_vector(float v[3])
 
 	squared = pow((double)v[0], 2) + pow((double)v[1], 2) + pow((double)v[2], 2);
 	magnitude = (float)sqrt(squared);
-	printf("before\n");
-	print_matrix_1_3(v);
+	// printf("before\n");
+	// print_matrix_1_3(v);
 	vector_scaling(v, 1 / magnitude);
-	printf("after\n");
-	print_matrix_1_3(v);
-
-
-
+	// printf("after\n");
+	// print_matrix_1_3(v);
 	// return ()
 }
 
@@ -207,60 +262,6 @@ void set_rgb_factor(float *rgb_factor)
 
 int	interpolate(int color_A, int color_B, float t);
 int create_color(int r, int g, int b);
-
-int visualize_sphere_normals(t_data *data, float res_xyz[3])
-{
-	float rgb_factor[3];
-
-	normalize_vector(res_xyz);
-	copy_matrix(rgb_factor, res_xyz);
-	set_rgb_factor(&rgb_factor[0]);
-	set_rgb_factor(&rgb_factor[1]);
-	set_rgb_factor(&rgb_factor[2]);
-	// printf("factor\n");
-	// print_matrix_1_3(rgb_factor);
-	// printf("________________________\n");
-	// return (create_color(interpolate(BLUE, ORANGE, rgb_factor[0]) << 16, interpolate(RED, WHITE, rgb_factor[1]) << 8, interpolate(GREEN, BLACK, rgb_factor[2])));
-	int const color1 = interpolate(BLUE, WHITE, rgb_factor[0]);
-	int const color2 = interpolate(RED, color1, rgb_factor[1]);
-	int const color3 = interpolate(GREEN, color2, rgb_factor[2]);
-
-	return (color3);
-	// return (interpolate(BLUE, ORANGE, rgb_factor[0]));
-	// return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
-	//255 * rgb_factor[0]
-}
-
-int hit_object(t_data *data)
-{
-	float res_xyz[3];
-
-	// printf("ray direction\n"); 
-	// print_matrix_1_3(data->ray.scaled_vector);
-	// printf("obj center\n"); 
-	// print_matrix_1_3(data->sphere.object_center_xyz);
-	res_xyz[0] = data->ray.scaled_vector[0]
-		- data->sphere.object_center_xyz[0];
- 	res_xyz[1] = data->ray.scaled_vector[1]
-		- data->sphere.object_center_xyz[1];
-	res_xyz[2] = data->ray.scaled_vector[2]
-		- data->sphere.object_center_xyz[2];
-	// sleep(1);
-	// printf("result xyz %f %f %f\n", res_xyz[0], res_xyz[1], res_xyz[2]);
-
-	double squared = pow((double)res_xyz[0], 2) + pow((double)res_xyz[1], 2) + pow((double)res_xyz[2], 2);
-	// printf("sqrt(squared) %f\n", sqrt(squared));
-	// printf("radius %f\n",  data->sphere.radius);
-	// sleep(1);
-	if (sqrt(squared) <= (double)data->sphere.radius)
-	{
-		// visualize_sphere_normals(data, res_xyz);
-		return (visualize_sphere_normals(data, res_xyz));
-		// return (data->sphere.color);
-	}
-	else
-		return ((int)NADA);
-}
 
 typedef struct s_color
 {
@@ -312,117 +313,12 @@ int	interpolate(int color_A, int color_B, float t)
 	return (create_color(rgb_interpolate.r, rgb_interpolate.g, rgb_interpolate.b));
 }
 
-int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
-{
-	float	rota_horiz[3][3];
-	float	rota_vert[3][3];
-	float	comp[3][3];
-
-	init_t_around_z(rota_horiz, ft_degr_to_rad(angle_horiz));
-	init_t_around_y(rota_vert, ft_degr_to_rad(angle_vert));
-	compilation_matrix(comp, rota_horiz, rota_vert);
-	// if (PRINT_DEBUG) printf("angles horizontal, vertical: %f\t%f\n", angle_horiz, angle_vert);
-
-	// if (PRINT_DEBUG) printf("_________________\n");
-	// if (PRINT_DEBUG) printf("rotation\n");
-
-	// if (PRINT_DEBUG) print_matrix_3_3(comp);
-
-	// if (PRINT_DEBUG) printf("original\n");
-	// if (PRINT_DEBUG) print_matrix_1_3(data->camara.view_orientation_matrix);
-	init_result(data->ray.direction_abc);
-	matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
-	// if (PRINT_DEBUG) printf("result:\n");
-	// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
-	// usleep(100);
-	// if (PRINT_DEBUG) printf("_________________\n\n");
-	data->ray.vector_scalar_step = 1;
-	int step = 2;
-	// if (PRINT_DEBUG) printf("scaled:\n");
-	while (step < 200)
-	{
-		int hit_result;
-		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
-		vector_scaling(data->ray.scaled_vector, (float)step);
-		// if (angle_horiz > -0.05 && angle_horiz < 0.05)
-		hit_result = hit_object(data);
-		if (hit_result != NADA)
-		{
-			// normalize_vector(&data->ray.direction_abc)
-			// printf("hit at xyz: :\n");
-			// print_matrix_1_3(data->ray.scaled_vector);
-			return (hit_result);
-		}
-		step += 1;
-		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
-	}
-	// if (angle_horiz > 0 && angle_horiz < 0.09)
-	// 	printf("%f\n", data->ray.direction_abc[2]);
-	return (NADA);
-}
-
-
-void	send_rays_v2(t_data *data)
-{
-
-	float 	start_angle_horiz = -data->camara.field_of_view_rad / 2;
-	float 	start_angle_vert = data->camara.field_of_view_rad / 2;
-	float 	angle_horiz;
-	float 	angle_vert;
-
-
-
-
-	float 	angle_step_horiz = data->camara.field_of_view_rad / WINDOW_WIDTH;
-	float 	angle_step_vert = data->camara.field_of_view_rad / WINDOW_HEIGHT;
-
-
-}
-
-
-void	send_rays(t_data *data)
-{
-	int 	pixel_x;
-	int 	pixel_y;
-	int		color;
-	float 	start_angle_horiz = -data->camara.field_of_view_rad / 2;
-	float 	start_angle_vert = data->camara.field_of_view_rad / 2;
-	float 	angle_horiz;
-	float 	angle_vert;
-
-	float 	angle_step_horiz = data->camara.field_of_view_rad / WINDOW_WIDTH;
-	float 	angle_step_vert = data->camara.field_of_view_rad / WINDOW_HEIGHT;
-
-	angle_vert = start_angle_vert;
-	pixel_x = 0;
-	pixel_y = 0;
-	while (pixel_y <= WINDOW_HEIGHT)
-	{
-		pixel_x = 0;
-		angle_horiz = start_angle_horiz;
-		while (pixel_x <= WINDOW_WIDTH)
-		{
-			color = hit_ray(data, angle_horiz, angle_vert);
-			if (color == NADA)
-			{
-				float unit_point;
-
-				unit_point = (angle_vert + start_angle_vert) / data->camara.field_of_view_rad;
-				color = interpolate(WHITE, BLUE, unit_point);
-				// printf("angle hori verti: %f\t%f\n", angle_horiz, angle_vert);
-				// printf("xy: %d\t%d\n", pixel_x, pixel_y);
-			}
-			put_pixel_img(data->image, pixel_x, pixel_y, color);
-			pixel_x++;
-			angle_horiz += angle_step_horiz;
-		}
-		// sleep(2);
-		angle_vert -= angle_step_vert;
-		pixel_y++;
-	}
-	printf("done\n");
-}
-
+/**
+ * @note optimisation ideas:
+ * static or inline funtions
+ * 
+ * 
+*/
 int main(int argc, char **argv)
 {
 	t_data	data;
