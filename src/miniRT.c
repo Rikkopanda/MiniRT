@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 10:24:23 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 15:12:44 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	init_sphere(t_data *data)
 {
 	data->sphere.radius = 30;
 	data->sphere.color = ORANGE;
-	data->sphere.object_center_xyz[0] = 150;
+	data->sphere.object_center_xyz[0] = 50;
 	data->sphere.object_center_xyz[1] = 0;
 	data->sphere.object_center_xyz[2] = 0;
 }
