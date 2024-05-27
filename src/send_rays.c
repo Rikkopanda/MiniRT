@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 10:26:18 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/27 15:06:49 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,12 +95,9 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	init_t_around_y(rota_vert, angle_vert);
 	compilation_matrix(comp, rota_horiz, rota_vert);
 	// if (PRINT_DEBUG) printf("angles horizontal, vertical: %f\t%f\n", ft_rad_to_degr(angle_horiz), ft_rad_to_degr(angle_vert));
-
 	// if (PRINT_DEBUG) printf("_________________\n");
 	// if (PRINT_DEBUG) printf("rotation\n");
-
 	// if (PRINT_DEBUG) print_matrix_3_3(comp);
-
 	// if (PRINT_DEBUG) printf("original\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->camara.view_orientation_matrix);
 
