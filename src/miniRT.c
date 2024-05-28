@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:06:23 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 10:55:42 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 20:39:18 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,13 @@
 #include "../include/miniRT.h"
 
 
+
 void	init_light_source(t_data *data)
 {
 	data->light.brightness = 1;
-	data->light.position[0] = -100;
-	data->light.position[1] = -50;
-	data->light.position[2] = 100;
+	data->light.position[0] = 0;
+	data->light.position[1] = 0;
+	data->light.position[2] = -100;
 	data->light.rgb[0] = 255;
 	data->light.rgb[1] = 255;
 	data->light.rgb[2] = 255;
@@ -57,6 +58,7 @@ void	init_cylinder(t_data *data)
 	data->cylinder.object_center_xyz[2] = 100;
 	// data->cylinder.axis_vector_abc[0] = -1;
 }
+
 /*
 	void parse_input_and_init(char **scene_discription)
 	{
@@ -85,6 +87,8 @@ void	init_cylinder(t_data *data)
 		}
 	}
 */
+
+
 
 /**
  * @note optimisation ideas:

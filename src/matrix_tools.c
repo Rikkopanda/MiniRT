@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   matrix_tools.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 15:29:32 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/27 10:05:57 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 17:30:08 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,26 +55,6 @@ void	compilation_matrix(float comp[3][3], float R[3][3], float R3[3][3])
 	}
 }
 
-void	matrix_multiplication(float comp[3][3], t_ray *ray, float camara_vector[3])
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	while (i < 3)
-	{
-		j = 0;
-		while (j < 3)
-		{
-			ray->direction_abc[i]
-				+= camara_vector[j]
-				* comp[j][i];
-			j++;
-		}
-		i++;
-	}
-}
-
 void	copy_matrix(float dst[3], float src[3])
 {
 	int i;
@@ -107,6 +87,7 @@ void	matrix_multiply_1x3_3x3(float m1[3], float m2[3][3], float result_m[3])
 		i++;
 	}
 }
+
 
 
 void	vector_scaling(float v[3], float scale)

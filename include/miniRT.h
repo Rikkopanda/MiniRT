@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 11:52:40 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 20:35:19 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ typedef struct s_win
 
 enum e_hex_code
 {
-	NADA = 0x00000000,
+	NADA = -1,
 	BLACK = 0x000000FF,
 	GREY = 0x808080,
 	WHITE = 0xFFFFFFFF,
@@ -74,12 +74,18 @@ typedef struct s_img
 	int		line_len;
 }		t_img;
 
+typedef struct s_vec
+{
+	float m[3];
+} t_vec;
+
 typedef struct s_light_source
 {
-	int		position[3];
+	float		position[3];
 	int		rgb[3];
 	float	brightness; // range 0.0-1.0
 } t_light_source;
+
 /*
 Candle 255, 147, 41
 
@@ -145,9 +151,10 @@ typedef struct s_sphere_object
 
 typedef struct s_ray
 {
-	float	direction_abc[3];
-	float	vector_scalar_step;
-	float	scaled_vector[3];
+	t_vec	normalized_vec;
+	t_vec	scaled_vec;
+	float	world_pos_of_scaled_vec[3];
+	float	step;
 } t_ray;
 
 typedef struct s_camara
@@ -174,7 +181,6 @@ typedef struct s_transform_index
 	int	i;
 	int	l;
 	int	m;
-
 }	t_transform_index;
 
 typedef struct s_color

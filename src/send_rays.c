@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   send_rays.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 11:54:24 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 20:39:45 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,75 +52,124 @@ int visualize_sphere_normals(t_data *data, float res_xyz[3])
 	// return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
 }
 
-int hit_object(t_data *data, float posistion_ray[3])
+/**
+ * vector from point A to point B
+*/
+t_vec	points_derived_vector(float point_A[3], float point_B[3])
 {
-	float res_xyz[3];
+	t_vec	result_vec;
 
-	// printf("ray dir\n"); 
-	// print_matrix_1_3(data->ray.direction_abc);
+	result_vec.m[0] = point_B[0] - point_A[0]; 
+ 	result_vec.m[1] = point_B[1] - point_A[1];  
+	result_vec.m[2] = point_B[2] - point_A[2];  
+	return (result_vec);
+}
+
+void moved_vector_position(float result[3], t_vec target_vector, int offset[3])
+{
+	result[0] = target_vector.m[0] - offset[0]; 
+ 	result[1] = target_vector.m[1] - offset[1];  
+	result[2] = target_vector.m[2] - offset[2];
+}
+
+int	sphere_intersection_equation(t_data *data, t_vec obj_to_ray_vec)
+{
+	const float squared = powf(obj_to_ray_vec.m[0], 2) + powf(obj_to_ray_vec.m[1], 2) + powf(obj_to_ray_vec.m[2], 2);
+
+	if (sqrtf(squared) <= data->sphere.radius)
+		return (TRUE);
+	else
+		return (FALSE);
+}
+
+float	dot_product_3d(float vec_A[3], float vec_B[3])
+{
+	return ((vec_A[0] * vec_B[0]) + (vec_A[1] * vec_B[1]) + (vec_A[2] * vec_B[2]));
+}
+
+float	cross_product_3d(float vec_A[3], float vec_B[3])
+{
+	return ((vec_A[2] * vec_B[3]) - (vec_B[2] * vec_A[3]) +
+			(vec_A[3] * vec_B[1]) - (vec_B[3] * vec_A[1]) +
+			(vec_A[1] * vec_B[2]) - (vec_B[1] * vec_A[2]));
+}
+
+
+/**
+ * @note not declaring and initializing new vectors faster??
+*/
+int check_if_hit(t_data *data, t_ray *ray, t_vec *obj_to_ray_vec)
+{
+	moved_vector_position(ray->world_pos_of_scaled_vec, ray->scaled_vec, data->camara.pos_xyz);
+	// print_matrix_1_3(ray->world_pos_of_scaled_vec);
+	
+	*obj_to_ray_vec = points_derived_vector(data->sphere.object_center_xyz, ray->world_pos_of_scaled_vec);
 	// printf("ray scaled\n"); 
-	// print_matrix_1_3(data->ray.scaled_vector);
-	// printf("obj center\n");
-	// print_matrix_1_3(data->sphere.object_center_xyz);
-	res_xyz[0] = (posistion_ray[0] - data->camara.pos_xyz[0])
-		- data->sphere.object_center_xyz[0];
- 	res_xyz[1] = (posistion_ray[1] - data->camara.pos_xyz[1])
-		- data->sphere.object_center_xyz[1];
-	res_xyz[2] = (posistion_ray[2] - data->camara.pos_xyz[2])
-		- data->sphere.object_center_xyz[2];
-	// usleep(5000);
-	// printf("result xyz %f %f %f\n", res_xyz[0], res_xyz[1], res_xyz[2]);
-
-	double squared = pow((double)res_xyz[0], 2) + pow((double)res_xyz[1], 2) + pow((double)res_xyz[2], 2);
-	// printf("sqrt(squared) %f\n", sqrt(squared));
-	// printf("radius %f\n",  data->sphere.radius);
+	// print_matrix_1_3(ray->scaled_vec.m);
+	// printf("obj to ray vec\n");
+	// print_matrix_1_3(obj_to_ray_vec.m);
 	// sleep(1);
-	if (sqrt(squared) <= (double)data->sphere.radius)
+	if (sphere_intersection_equation(data, *obj_to_ray_vec) == TRUE)
 	{
-
 		// visualize_sphere_normals(data, res_xyz);
-		// return (visualize_sphere_normals(data, res_xyz));
+		// return (visualize_sphere_normals(data, (*obj_to_ray_vec).m));
 		// int shadow_check = shadow_ray_to_light();
 		// return ();
 		return (data->sphere.color);
 	}
 	else
 		return ((int)NADA);
-}
-
-void	print_vector(float vec[3])
-{
-	printf("x: %f, y: %f, z: %f\n", vec[0], vec[1], vec[2]);
+	// usleep(5000);
+	// printf("result xyz %f %f %f\n", res_xyz[0], res_xyz[1], res_xyz[2]);
+	// printf("sqrt(squared) %f\n", sqrt(squared));
+	// printf("radius %f\n",  data->sphere.radius);
+	// sleep(1);
 }
 
 int	shadow_ray_to_light(t_data *data)
 {
+
 	float	position[3];
 	float	light_ray[3];
-	float	*surface_point = data->ray.scaled_vector;// must be actual surface point, not in the object! like now
 
-	light_ray[0] = data->light.position[0] - surface_point[0];
-	light_ray[1] = data->light.position[1] - surface_point[1];
-	light_ray[2] = data->light.position[2] - surface_point[2];
-	init_result(position);
-	normalize_vector(light_ray);
-	int steps = 0;
+// 	int steps = 0;
 
-	position[0] = surface_point[0] + light_ray[0];
-	position[1] = surface_point[1] + light_ray[1];
-	position[2] = surface_point[2] + light_ray[2];
-	while (steps < 200) // ray in object? = shadow
-	{
-		position[0] += light_ray[0];
-		position[1] += light_ray[1];
-		position[2] += light_ray[2];
-		// if (PRINT_DEBUG) print_matrix_1_3(position);
-		if (hit_object(data, position))
-			return (FALSE);
-		steps++;
-	}
+// 	position[0] = surface_point[0] + light_ray[0];
+// 	position[1] = surface_point[1] + light_ray[1];
+// 	position[2] = surface_point[2] + light_ray[2];
+// 	while (steps < 200) // ray in object? = shadow
+// 	{
+// 		position[0] += light_ray[0];
+// 		position[1] += light_ray[1];
+// 		position[2] += light_ray[2];
+// 		// if (PRINT_DEBUG) print_matrix_1_3(position);
+// 		if (check_if_hit(data, position))
+// 			return (FALSE);
+// 		steps++;
+// 	}
 	return (TRUE);
 }
+
+void	increment_vec(t_vec *scaled_vector, t_vec *normalize_vector)
+{
+	(*scaled_vector).m[0] += (*normalize_vector).m[0];
+	(*scaled_vector).m[1] += (*normalize_vector).m[1];
+	(*scaled_vector).m[2] += (*normalize_vector).m[2];
+}
+
+// float	*int_1x3_to_float_1x3(int i_arr[3])
+// {
+// 	float	f_arr[3];
+// 	int		i;
+
+// 	i = 0;	
+// 	while (i < 3)
+// 	{
+// 		f_arr[i] = i_arr[i];
+// 		i++;
+// 	}
+// 	return (f_arr);
+// }
 
 int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 {
@@ -128,9 +177,12 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	float	rota_vert[3][3];
 	float	comp[3][3];
 
+
+
 	init_t_around_z(rota_horiz, angle_horiz);
 	init_t_around_y(rota_vert, angle_vert);
 	compilation_matrix(comp, rota_horiz, rota_vert);
+
 	// if (PRINT_DEBUG) printf("angles horizontal, vertical: %f\t%f\n", ft_rad_to_degr(angle_horiz), ft_rad_to_degr(angle_vert));
 	// if (PRINT_DEBUG) printf("_________________\n");
 	// if (PRINT_DEBUG) printf("rotation\n");
@@ -138,35 +190,59 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	// if (PRINT_DEBUG) printf("original\n");
 	// if (PRINT_DEBUG) print_matrix_1_3(data->camara.view_orientation_matrix);
 
-	init_result(data->ray.direction_abc);
-	matrix_multiplication(comp, &data->ray, data->camara.view_orientation_matrix);
+	init_result(data->ray.normalized_vec.m);
+
+	matrix_multiply_1x3_3x3(data->camara.view_orientation_matrix, comp, data->ray.normalized_vec.m);
 
 	// if (PRINT_DEBUG) printf("result:\n");
-	// if (PRINT_DEBUG) print_matrix_1_3(data->ray.direction_abc);
+	// if (PRINT_DEBUG) print_matrix_1_3(data->ray.normalized_vec.m);
 	// if (PRINT_DEBUG) printf("_________________\n\n");
-	data->ray.vector_scalar_step = 1;
-	int step = 1;
-	// if (PRINT_DEBUG) printf("scaled:\n");
-	while (step < 200)
+	// sleep(2);
+	data->ray.step = 1;
+	init_result(data->ray.scaled_vec.m);
+
+	while (data->ray.step < 200)
 	{
-		int hit_result;
-		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
-		vector_scaling(data->ray.scaled_vector, (float)step);
-		// if (angle_horiz > -0.05 && angle_horiz < 0.05)
-		hit_result = hit_object(data, data->ray.scaled_vector);
-		if (hit_result != NADA)
+		int resulting_color;
+
+		t_sphere_object hit_object;
+		t_vec			obj_to_ray_vec;
+		// sleep(1);
+
+		increment_vec(&data->ray.scaled_vec, &data->ray.normalized_vec);
+
+		resulting_color = check_if_hit(data, &data->ray, &obj_to_ray_vec);
+		// if (dot_product_3d())
+		if (resulting_color != NADA)
 		{
-			if (shadow_ray_to_light(data) == TRUE)
-				return (hit_result);
+			t_vec surface_normal;
+			
+			copy_matrix(surface_normal.m, obj_to_ray_vec.m);
+			normalize_vector(surface_normal.m);
+			float	*surface_point = data->ray.scaled_vec.m;// must be actual surface point, not in the object! like now
+			// print_matrix_1_3(data->ray.scaled_vec.m);
+			// print_matrix_1_3(data->light.position);
+
+			t_vec surface_to_light_ray = points_derived_vector(data->ray.scaled_vec.m, data->light.position);
+			normalize_vector(surface_to_light_ray.m);
+			// printf("surface normal:\n");
+			// print_matrix_1_3(surface_normal.m);
+			// printf("surface to light:\n");
+			// print_matrix_1_3(surface_to_light_ray.m);
+			// printf(" ______:\n");
+			// sleep(1);
+			float one[3] = {200, 200, 200};
+			float two[3] = {-100, -100, -100};
+			// printf("dot product %f\n_______\n", dot_product_3d(one, two));
+
+			// printf("dot product %f\n", dot_product_3d(surface_normal.m, surface_to_light_ray.m));
+			if (dot_product_3d(surface_normal.m, surface_to_light_ray.m) < 0)
+				return (0);
 			else
-				return (GREY);
-			// normalize_vector(data->ray.direction_abc);
-			// printf("hit at xyz: :\n");
-			// print_matrix_1_3(data->ray.scaled_vector);
-			return (hit_result);
+				return (resulting_color);
 		}
-		step += 1;
-		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.scaled_vector);
+		data->ray.step += 1;
+		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.scaled_vec.m);
 	}
 	// if (angle_horiz > 0 && angle_horiz < 0.09)
 	// 	printf("%f\n", data->ray.direction_abc[2]);

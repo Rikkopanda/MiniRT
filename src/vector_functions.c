@@ -11,10 +11,10 @@ void normalize_vector(float v[3])
 
 	squared = pow((double)v[0], 2) + pow((double)v[1], 2) + pow((double)v[2], 2);
 	magnitude = (float)sqrt(squared);
-	// printf("before\n");
-	// print_matrix_1_3(v);
 	vector_scaling(v, 1 / magnitude);
-	// printf("after\n");
-	// print_matrix_1_3(v);
-	// return ()
+}
+
+void	print_vector(float vec[3])
+{
+	printf("x: %f, y: %f, z: %f\n", vec[0], vec[1], vec[2]);
 }
