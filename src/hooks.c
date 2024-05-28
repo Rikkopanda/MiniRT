@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/27 09:26:30 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/27 10:22:44 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 10:59:48 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,24 @@ int	left_up_right_down_forward_backward(int keysym, t_data *data)
 		return (data->camara.pos_xyz[2] += 10, 1);	
 	else if (keysym == 'f')
 		return (data->camara.pos_xyz[2] -= 10, 1);
+	else
+		return (0);
+}
+
+int move_lighting(int keysym, t_data *data)
+{
+	if (keysym == 'j')
+		return (data->light.position[0] += 50, 1);
+	else if (keysym == 'l')
+		return (data->light.position[0] -= 50, 1);	
+	else if (keysym == 'k')
+		return (data->light.position[1] += 50, 1);	
+	else if (keysym == 'i')
+		return (data->light.position[1] -= 50, 1);	
+	else if (keysym == 'o')
+		return (data->light.position[2] += 50, 1);	
+	else if (keysym == 'p')
+		return (data->light.position[2] -= 50, 1);
 	else
 		return (0);
 }
@@ -89,7 +107,8 @@ int handle_input(int keysym, t_data *data)
 {
 	if (left_up_right_down_forward_backward(keysym, data) == FALSE
 		&& rotate_view(keysym, data) == FALSE
-		&& extra_keys(keysym, data) == FALSE)
+		&& extra_keys(keysym, data) == FALSE
+		&& move_lighting(keysym, data) == FALSE)
 		return (0);
 	send_rays(data);
 	mlx_put_image_to_window(data->mlx.mlx_ptr, data->mlx.win_ptr, data->image.img_ptr, 0, 0);

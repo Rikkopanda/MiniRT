@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 09:49:22 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 11:52:40 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "../minilibx-linux/mlx.h"
+#include <stdlib.h>
 
 enum keys
 {
@@ -53,6 +54,7 @@ enum e_hex_code
 {
 	NADA = 0x00000000,
 	BLACK = 0x000000FF,
+	GREY = 0x808080,
 	WHITE = 0xFFFFFFFF,
 	RED = 0x00FF00FF,
 	GREEN = 0x0000FFFF,
@@ -71,6 +73,58 @@ typedef struct s_img
 	int		endian;
 	int		line_len;
 }		t_img;
+
+typedef struct s_light_source
+{
+	int		position[3];
+	int		rgb[3];
+	float	brightness; // range 0.0-1.0
+} t_light_source;
+/*
+Candle 255, 147, 41
+
+40W Tungsten 255, 197, 143
+
+100W Tungsten 255, 214, 170
+
+Halogen 255, 241, 224
+
+Carbon Arc 255, 250, 244
+
+High Noon Sun 255, 255, 251
+
+Direct Sunlight 255, 255, 255
+
+Overcast Sky 201, 226, 255
+
+Clear Blue Sky 64, 156, 255
+
+Warm Fluorescent 255, 244, 229
+
+Standard Fluorescent 244, 255, 250
+
+Cool White Fluorescent 212, 235, 255
+
+Full Spectrum Fluorescent 255, 244, 242
+
+Grow Light Fluorescent 255, 239, 247
+
+Black Light Fluorescent 167, 0, 255
+
+Mercury Vapor 216, 247, 255
+
+Sodium Vapor 255, 209, 178
+
+Metal Halide 242, 252, 255
+
+High Pressure Sodium 255, 183, 7
+*/
+typedef struct s_ambient_lightning //what does this mean, just reflected light?
+{
+	
+	int		rgb[3]; // https://www.reddit.com/r/spaceengineers/comments/3e0k38/rgb_values_for_various_types_of_realworld_lights/
+	float	lightning_ratio; // range 0.0-1.0
+} t_ambient_lightning;
 
 typedef struct s_cylinder_object
 {
@@ -111,6 +165,7 @@ typedef struct s_data
 	t_cylinder_object	cylinder;
 	t_camara			camara;
 	t_ray				ray;
+	t_light_source		light;
 } t_data;
 
 typedef struct s_transform_index

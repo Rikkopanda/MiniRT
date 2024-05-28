@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/27 15:06:49 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/28 11:54:24 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int visualize_sphere_normals(t_data *data, float res_xyz[3])
 	// return (create_color((int)((float)255 * rgb_factor[0]) & 0xFF, (int)((float)255 * rgb_factor[1]) & 0xFF, (int)((float)255 * rgb_factor[2]) & 0xFF));
 }
 
-int hit_object(t_data *data)
+int hit_object(t_data *data, float posistion_ray[3])
 {
 	float res_xyz[3];
 
@@ -62,11 +62,11 @@ int hit_object(t_data *data)
 	// print_matrix_1_3(data->ray.scaled_vector);
 	// printf("obj center\n");
 	// print_matrix_1_3(data->sphere.object_center_xyz);
-	res_xyz[0] = (data->ray.scaled_vector[0] - data->camara.pos_xyz[0])
+	res_xyz[0] = (posistion_ray[0] - data->camara.pos_xyz[0])
 		- data->sphere.object_center_xyz[0];
- 	res_xyz[1] = (data->ray.scaled_vector[1] - data->camara.pos_xyz[1])
+ 	res_xyz[1] = (posistion_ray[1] - data->camara.pos_xyz[1])
 		- data->sphere.object_center_xyz[1];
-	res_xyz[2] = (data->ray.scaled_vector[2] - data->camara.pos_xyz[2])
+	res_xyz[2] = (posistion_ray[2] - data->camara.pos_xyz[2])
 		- data->sphere.object_center_xyz[2];
 	// usleep(5000);
 	// printf("result xyz %f %f %f\n", res_xyz[0], res_xyz[1], res_xyz[2]);
@@ -77,12 +77,49 @@ int hit_object(t_data *data)
 	// sleep(1);
 	if (sqrt(squared) <= (double)data->sphere.radius)
 	{
+
 		// visualize_sphere_normals(data, res_xyz);
-		return (visualize_sphere_normals(data, res_xyz));
-		// return (data->sphere.color);
+		// return (visualize_sphere_normals(data, res_xyz));
+		// int shadow_check = shadow_ray_to_light();
+		// return ();
+		return (data->sphere.color);
 	}
 	else
 		return ((int)NADA);
+}
+
+void	print_vector(float vec[3])
+{
+	printf("x: %f, y: %f, z: %f\n", vec[0], vec[1], vec[2]);
+}
+
+int	shadow_ray_to_light(t_data *data)
+{
+	float	position[3];
+	float	light_ray[3];
+	float	*surface_point = data->ray.scaled_vector;// must be actual surface point, not in the object! like now
+
+	light_ray[0] = data->light.position[0] - surface_point[0];
+	light_ray[1] = data->light.position[1] - surface_point[1];
+	light_ray[2] = data->light.position[2] - surface_point[2];
+	init_result(position);
+	normalize_vector(light_ray);
+	int steps = 0;
+
+	position[0] = surface_point[0] + light_ray[0];
+	position[1] = surface_point[1] + light_ray[1];
+	position[2] = surface_point[2] + light_ray[2];
+	while (steps < 200) // ray in object? = shadow
+	{
+		position[0] += light_ray[0];
+		position[1] += light_ray[1];
+		position[2] += light_ray[2];
+		// if (PRINT_DEBUG) print_matrix_1_3(position);
+		if (hit_object(data, position))
+			return (FALSE);
+		steps++;
+	}
+	return (TRUE);
 }
 
 int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
@@ -116,9 +153,13 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 		copy_matrix(data->ray.scaled_vector, data->ray.direction_abc);
 		vector_scaling(data->ray.scaled_vector, (float)step);
 		// if (angle_horiz > -0.05 && angle_horiz < 0.05)
-		hit_result = hit_object(data);
+		hit_result = hit_object(data, data->ray.scaled_vector);
 		if (hit_result != NADA)
 		{
+			if (shadow_ray_to_light(data) == TRUE)
+				return (hit_result);
+			else
+				return (GREY);
 			// normalize_vector(data->ray.direction_abc);
 			// printf("hit at xyz: :\n");
 			// print_matrix_1_3(data->ray.scaled_vector);
@@ -163,7 +204,6 @@ void	send_rays(t_data *data)
 				float unit_point;
 
 				// unit_point = world_horizon_opposed_to_ray(data);
-
 				unit_point = (r_t.angle_vert - r_t.start_angle_vert) / data->camara.field_of_view_rad;
 				color = interpolate(WHITE, BLUE, unit_point);
 			}
