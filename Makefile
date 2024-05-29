@@ -2,6 +2,8 @@
 
 NAME = minirt
 
+CC = gcc
+
 OBJDIR = obj/
 
 SRCDIR = src/
@@ -41,10 +43,10 @@ $(OBJDIR):
 	mkdir $(OBJDIR)
 
 $(NAME): $(OBJS) $(HEADERS)
-	cc $(OBJS) $(FLAGS) $(INCLUDE) $(MINILIBX) -Lmlx_Linux -Imlx_Linux -lXext -lX11 -lm -lz -o $(NAME)
+	$(CC) $(OBJS) $(FLAGS) $(INCLUDE) $(MINILIBX) -Lmlx_Linux -Imlx_Linux -lXext -lX11 -lm -lz -o $(NAME)
 
 $(OBJS): $(OBJDIR)%.o: $(SRCDIR)%.c
-	cc $(FLAGS) $(INCLUDE) -O3 -c $< -o $@
+	$(CC) $(FLAGS) $(INCLUDE) -Ofast -c $< -o $@
 
 clean:
 	rm -f $(OBJS)

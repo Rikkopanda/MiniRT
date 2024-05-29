@@ -6,7 +6,7 @@
 /*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/27 09:26:30 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/28 10:59:48 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/05/29 10:15:21 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,32 +69,30 @@ int	rotate_view(int keysym, t_data *data)
 	float	original_orientation_matrix[3];
 
 	copy_matrix(original_orientation_matrix, data->camara.view_orientation_matrix);
-	printf("rotating...\n");
-
 	if (keysym == UP)
 	{
 		init_t_around_y(add_angle, DEGR_10_IN_RAD);
 		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);	
-		return (TRUE);
+		return (printf("rotating...\n"), TRUE);
 	}
 	else if (keysym == DOWN)
 	{
 		init_t_around_y(add_angle, -DEGR_10_IN_RAD);
 		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
-		return (TRUE);
+		return (printf("rotating...\n"), TRUE);
 	}
 	else if (keysym == LEFT)
 	{
 		init_t_around_z(add_angle, DEGR_10_IN_RAD);
 		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
-		return (TRUE);
+		return (printf("rotating...\n"), TRUE);
 
 	}
 	else if (keysym == RIGHT)
 	{
 		init_t_around_z(add_angle, -DEGR_10_IN_RAD);
 		matrix_multiply_1x3_3x3(original_orientation_matrix, add_angle, data->camara.view_orientation_matrix);
-		return (TRUE);
+		return (printf("rotating...\n"), TRUE);
 	}
 	return (FALSE);
 }

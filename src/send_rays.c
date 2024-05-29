@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   send_rays.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
+/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 20:39:45 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/29 11:54:19 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ void init_ray_send_tools(t_ray_sending_tools *r_t, t_data *data)
 	r_t->perpendicular_distance_vert_triangle = r_t->half_screen_height / (float)tan(r_t->start_angle_vert);
 }
 
-void set_rgb_factor(float *rgb_factor)
+/**
+ * make factor fall between 0 and 1
+*/
+void fit_interpolation_range(float *rgb_factor)
 {
 	*rgb_factor += 1;
 	*rgb_factor *= 0.5;
@@ -36,14 +39,14 @@ int visualize_sphere_normals(t_data *data, float res_xyz[3])
 
 	normalize_vector(res_xyz);
 	copy_matrix(rgb_factor, res_xyz);
-	set_rgb_factor(&rgb_factor[0]);
-	set_rgb_factor(&rgb_factor[1]);
-	set_rgb_factor(&rgb_factor[2]);
+	fit_interpolation_range(&rgb_factor[0]);
+	fit_interpolation_range(&rgb_factor[1]);
+	fit_interpolation_range(&rgb_factor[2]);
 	// printf("factor\n");
 	// print_matrix_1_3(rgb_factor);
 	// printf("________________________\n");
 	// return (create_color(interpolate(BLUE, ORANGE, rgb_factor[0]) << 16, interpolate(RED, WHITE, rgb_factor[1]) << 8, interpolate(GREEN, BLACK, rgb_factor[2])));
-	int const color1 = interpolate(BLUE, WHITE, rgb_factor[0]);
+	int const color1 = interpolate(BLUE, (int)WHITE, rgb_factor[0]);
 	int const color2 = interpolate(RED, color1, rgb_factor[1]);
 	int const color3 = interpolate(GREEN, color2, rgb_factor[2]);
 
@@ -171,13 +174,12 @@ void	increment_vec(t_vec *scaled_vector, t_vec *normalize_vector)
 // 	return (f_arr);
 // }
 
+
 int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 {
 	float	rota_horiz[3][3];
 	float	rota_vert[3][3];
 	float	comp[3][3];
-
-
 
 	init_t_around_z(rota_horiz, angle_horiz);
 	init_t_around_y(rota_vert, angle_vert);
@@ -208,12 +210,12 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 		t_sphere_object hit_object;
 		t_vec			obj_to_ray_vec;
 		// sleep(1);
+		t_color color;
 
 		increment_vec(&data->ray.scaled_vec, &data->ray.normalized_vec);
-
-		resulting_color = check_if_hit(data, &data->ray, &obj_to_ray_vec);
+		color.color_code = check_if_hit(data, &data->ray, &obj_to_ray_vec);
 		// if (dot_product_3d())
-		if (resulting_color != NADA)
+		if (color.color_code != NADA)
 		{
 			t_vec surface_normal;
 			
@@ -231,15 +233,24 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 			// print_matrix_1_3(surface_to_light_ray.m);
 			// printf(" ______:\n");
 			// sleep(1);
-			float one[3] = {200, 200, 200};
+			float one[3] = {-200, -200, -100};
 			float two[3] = {-100, -100, -100};
-			// printf("dot product %f\n_______\n", dot_product_3d(one, two));
 
+			normalize_vector(one);
+			normalize_vector(two);
+
+			// printf("dot product %f\n_______\n", dot_product_3d(one, two));
+			float rgb_factor = dot_product_3d(surface_normal.m, surface_to_light_ray.m);
+			if (rgb_factor <= 0)
+				return (GREEN);
+			init_rgb(&color, data->sphere.color);
+			init_rgb_f(color.rgb_f, color.rgb);
+			normalize_vector(color.rgb_f);
+			vector_scaling(color.rgb_f, rgb_factor);
+			make_rgb_with_normalized_rgb_f(color.rgb, color.rgb_f);
+			color.color_code = create_color(color.rgb[0], color.rgb[1], color.rgb[2]);
 			// printf("dot product %f\n", dot_product_3d(surface_normal.m, surface_to_light_ray.m));
-			if (dot_product_3d(surface_normal.m, surface_to_light_ray.m) < 0)
-				return (0);
-			else
-				return (resulting_color);
+			return (color.color_code);
 		}
 		data->ray.step += 1;
 		// if (PRINT_DEBUG) print_matrix_1_3(data->ray.scaled_vec.m);
@@ -281,7 +292,7 @@ void	send_rays(t_data *data)
 
 				// unit_point = world_horizon_opposed_to_ray(data);
 				unit_point = (r_t.angle_vert - r_t.start_angle_vert) / data->camara.field_of_view_rad;
-				color = interpolate(WHITE, BLUE, unit_point);
+				color = interpolate((int)WHITE, BLUE, unit_point);
 			}
 			put_pixel_img(data->image, r_t.pixel_x, r_t.pixel_y, color);
 			r_t.pixel_x++;

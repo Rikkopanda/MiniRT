@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
+/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 18:42:48 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 20:35:19 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/05/29 10:11:15 by rverhoev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ typedef struct s_vec
 
 typedef struct s_light_source
 {
-	float		position[3];
+	float	position[3];
 	int		rgb[3];
 	float	brightness; // range 0.0-1.0
 } t_light_source;
@@ -127,7 +127,6 @@ High Pressure Sodium 255, 183, 7
 */
 typedef struct s_ambient_lightning //what does this mean, just reflected light?
 {
-	
 	int		rgb[3]; // https://www.reddit.com/r/spaceengineers/comments/3e0k38/rgb_values_for_various_types_of_realworld_lights/
 	float	lightning_ratio; // range 0.0-1.0
 } t_ambient_lightning;
@@ -140,6 +139,13 @@ typedef struct s_cylinder_object
 	float	height;
 	int		color;
 } t_cylinder_object;
+
+typedef struct s_color
+{
+	int		rgb[3];
+	int		color_code;
+	float	rgb_f[3];
+} t_color;
 
 typedef struct s_sphere_object
 {
@@ -155,6 +161,7 @@ typedef struct s_ray
 	t_vec	scaled_vec;
 	float	world_pos_of_scaled_vec[3];
 	float	step;
+	// t_color	result_color;
 } t_ray;
 
 typedef struct s_camara
@@ -182,13 +189,6 @@ typedef struct s_transform_index
 	int	l;
 	int	m;
 }	t_transform_index;
-
-typedef struct s_color
-{
-	int r;
-	int g;
-	int b;
-} t_color;
 
 enum e_key_codes
 {
@@ -233,6 +233,9 @@ void	send_rays(t_data *data);
 
 void	put_pixel_img(t_img img, int x, int y, int color);
 void	init_rgb(t_color *rgb, int color);
+void	init_rgb_f(float rgb_f[3], int rgb[3]);
+void	make_rgb_with_normalized_rgb_f(int rgb[3], float rgb_f[3]);
+int		create_color(int r, int g, int b);
 
 void	print_matrix_3_3(float m[3][3]);
 void	print_matrix_1_3(float m[3]);

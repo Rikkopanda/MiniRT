@@ -1,3 +1,16 @@
 https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 
 https://developer.nvidia.com/blog/practical-tips-for-optimizing-ray-tracing/
+
+
+raytracer overview
+https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-ray-tracing/adding-reflection-and-refraction.html
+
+https://pbr-book.org/4ed/Introduction/Photorealistic_Rendering_and_the_Ray-Tracing_Algorithm
+
+goeie korte uitleg + formules
+http://www.cs.otago.ac.nz/cosc342/2017-notes/342-2017lect16.pdf
+
+
+optimalisaties
+https://www.jakef.science/posts/gcc-wtf/
