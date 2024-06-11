@@ -1,19 +1,6 @@
 
 #include "miniRT.h"
 
-void	put_pixel_img(t_img img, int x, int y, int color)
-{
-	char	*dst;
-
-	if (color == (int)0xFF000000)
-		return ;
-	if (x >= 0 && y >= 0 && x < img.w && y < img.h)
-	{
-		dst = img.addr + (y * img.line_len + x * (img.bpp / 8));
-		*(unsigned int *) dst = color;
-	}
-}
-
 int	get_r(int color)
 {
 	return (color >> 16 & 0xFF);

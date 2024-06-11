@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mlx_functions.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rverhoev <rverhoev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/27 09:27:12 by rverhoev          #+#    #+#             */
-/*   Updated: 2024/05/27 09:27:22 by rverhoev         ###   ########.fr       */
+/*   Updated: 2024/06/11 10:19:35 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,4 +40,17 @@ void	destroy_image(t_img img)
 {
 	if (img.img_ptr && img.win.mlx_ptr)
 		mlx_destroy_image(img.win.mlx_ptr, img.img_ptr);
+}
+
+void	put_pixel_img(t_img img, int x, int y, int color)
+{
+	char	*dst;
+
+	if (color == (int)0xFF000000)
+		return ;
+	if (x >= 0 && y >= 0 && x < img.w && y < img.h)
+	{
+		dst = img.addr + (y * img.line_len + x * (img.bpp / 8));
+		*(unsigned int *) dst = color;
+	}
 }

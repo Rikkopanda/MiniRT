@@ -6,7 +6,7 @@
 /*   By: rikverhoeven <rikverhoeven@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 13:18:38 by rikverhoeve       #+#    #+#             */
-/*   Updated: 2024/05/28 20:39:45 by rikverhoeve      ###   ########.fr       */
+/*   Updated: 2024/06/11 10:09:39 by rikverhoeve      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,8 +176,6 @@ int	hit_ray(t_data *data, float angle_horiz, float angle_vert)
 	float	rota_horiz[3][3];
 	float	rota_vert[3][3];
 	float	comp[3][3];
-
-
 
 	init_t_around_z(rota_horiz, angle_horiz);
 	init_t_around_y(rota_vert, angle_vert);
